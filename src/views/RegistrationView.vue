@@ -9,7 +9,7 @@
           </svg>
         </div>
         <div class="col">
-          <h1 class="display-5 mb-4">
+          <h1 class="display-5 mb-4 mt-5">
             Registration Page
           </h1>
 
@@ -79,9 +79,9 @@ export default {
     const router = useRouter()
 
     async function createNewPatient() {
-      const { ok } = await usePost('patient/register', patient.value)
+      const { ok, data } = await usePost('patient/register', patient.value)
       if (ok) {
-        router.push({ name: 'vitals' })
+        router.push({ name: 'vitals', params: { id: data._id } })
       }
     }
 

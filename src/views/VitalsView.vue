@@ -8,17 +8,34 @@
           </svg>
         </div>
         <div class="col">
-          <h1 class="display-5 mb-4">
+          <h1 class="display-5 mb-4 mt-5">
             Vitals Form
           </h1>
 
-          <BaseInput id="date" labelText="Date" />
+          <BaseInput
+            id="date"
+            v-model="vitals.date"
+            :inputValue="vitals.date"
+            labelText="Date" />
 
-          <BaseInput id="height" labelText="Height" />
+          <BaseInput
+            id="height"
+            v-model="vitals.height"
+            :inputValue="vitals.height"
+            labelText="Height" />
 
-          <BaseInput id="weight" labelText="Weight" />
+          <BaseInput
+            id="weight"
+            v-model="vitals.weight"
+            :inputValue="vitals.weight"
+            labelText="Weight" />
 
-          <BaseInput id="bmi" labelText="BMI" />
+          <BaseInput
+            id="bmi"
+            :labelText="'BMI - ' + bmi"
+            v-model="bmi"
+            :value="bmi"
+            disabled="true" />
 
           <div class="row mt-3">
             <div class="col">
@@ -29,7 +46,7 @@
             <div class="col"></div>
             <div class="col">
               <div class="d-grid gap-2">
-                <RouterLink to="/form-view/underweight" type="button" class="btn btn-success">Save</RouterLink>
+                <button @click="createNewVitals()" to="/form-view/underweight" type="button" class="btn btn-success">Save</button>
               </div>
             </div>
           </div>
@@ -40,12 +57,46 @@
 </template>
 
 <script>
+import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import BaseInput from '@/components/Common/BaseInput.vue'
+import useAxios from '@/composables/useAxios'
 
 export default {
   name: 'VitalsView',
   components: {
     BaseInput
   },
+  setup() {
+    const vitals = ref({
+      date: '',
+      height: 0,
+      weight: 0,
+    })
+    const bmi = computed(() => {
+      return (Number(vitals.value.weight) / (Number(vitals.value.height) * Number(vitals.value.height))).toFixed(2)
+    })
+
+    const { usePost } = useAxios()
+    const route = useRoute()
+    console.log(route.params.id)
+
+    async function createNewVitals() {
+      const body = {
+        patientId: route.params.id,
+        bodyMassIndex: bmi.value,
+        ...vitals.value
+      }
+      const { data } = await usePost('visit/update-vitals', body)
+      console.log(data)
+    }
+
+    return {
+      route,
+      vitals,
+      bmi,
+      createNewVitals,
+    }
+  }
 }
 </script>

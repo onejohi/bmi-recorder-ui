@@ -9,13 +9,18 @@
           </svg>
         </div>
         <div class="col">
+
           <h1 class="display-5 mb-4">
-            Normal Weight
+            {{ route.params.type === 'normal' ? 'Form A' : 'Form B (Overweight)' }}
           </h1>
 
-          <p class="h5">General Health</p>
+          <div v-for="question in questions" :key="question._id" class="mb-3">
+            <p class="h5">
+              {{ question.question }}
+            </p>
 
-          <RadioInput id="date" labelText="Date" />
+            <RadioInput :options="question.options" :id="question._id" />
+          </div>
 
           <div class="row mt-3">
             <div class="col">
@@ -37,12 +42,30 @@
 </template>
 
 <script>
+import { onMounted, ref } from 'vue'
 import RadioInput from '@/components/Common/RadioInput.vue'
+import useAxios from '@/composables/useAxios'
+import { useRoute } from 'vue-router'
 
 export default {
   name: 'FormView',
   components: {
     RadioInput
   },
+  setup() {
+    const route = useRoute()
+    const { useGet } = useAxios()
+    const questions = ref([])
+
+    onMounted(async () => {
+      const { data } = await useGet(`visit/vitals-form/${route.params.type}`)
+      questions.value = data.questions
+    })
+
+    return {
+      questions,
+      route,
+    }
+  }
 }
 </script>

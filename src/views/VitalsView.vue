@@ -58,7 +58,7 @@
 
 <script>
 import { ref, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import BaseInput from '@/components/Common/BaseInput.vue'
 import useAxios from '@/composables/useAxios'
 
@@ -79,7 +79,7 @@ export default {
 
     const { usePost } = useAxios()
     const route = useRoute()
-    console.log(route.params.id)
+    const router = useRouter()
 
     async function createNewVitals() {
       const body = {
@@ -87,8 +87,9 @@ export default {
         bodyMassIndex: bmi.value,
         ...vitals.value
       }
-      const { data } = await usePost('visit/update-vitals', body)
-      console.log(data)
+      await usePost('visit/update-vitals', body)
+      router.push({ name: 'form-view', params: { type: bmi.value <= 25 ? 'normal' : 'overweight' } })
+
     }
 
     return {

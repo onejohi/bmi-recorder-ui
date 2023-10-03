@@ -1,14 +1,13 @@
 <template>
-  <div class="form-check">
-    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+  <div class="form-check" v-for="option in options" :key="option">
+    <input
+      class="form-check-input"
+      type="radio"
+      :id="id"
+      @input="$emit('update:modelValue', $event.target.value)"
+      :value="inputValue">
     <label class="form-check-label" for="flexRadioDefault1">
-      Default radio
-    </label>
-  </div>
-  <div class="form-check">
-    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" checked>
-    <label class="form-check-label" for="flexRadioDefault2">
-      Default checked radio
+      {{ option }}
     </label>
   </div>
 </template>
@@ -17,10 +16,15 @@
 export default {
   name: 'RadioInput',
   props: {
+    id: {
+      type: String,
+      default: 'flexRadioDefault1'
+    },
     options: {
       type: Array,
       default: () => []
     },
-  }
+  },
+  emits: ['update:modelValue']
 }
 </script>

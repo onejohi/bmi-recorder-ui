@@ -4,7 +4,10 @@
       :type="type"
       :class="classList"
       :id="id"
-      :placeholder="placeholder">
+      @input="$emit('update:modelValue', $event.target.value)"
+      :value="inputValue"
+      :placeholder="placeholder"
+      :disabled="disabled">
     <label :for="id">{{ labelText }}</label>
   </div>
 </template>
@@ -29,10 +32,18 @@ export default {
       type: String,
       default: '',
     },
+    inputValue: {
+      type: (String || Number),
+    },
     labelText: {
       type: String,
       default: 'Input'
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
     }
-  }
+  },
+  emits: ['update:modelValue']
 }
 </script>

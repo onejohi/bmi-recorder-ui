@@ -7,7 +7,7 @@
 
       <ul class="nav justify-content-end">
         <li class="nav-item">
-          <RouterLink to="/" class="nav-link active">Patients</RouterLink>
+          <RouterLink to="/" class="nav-link active">Patient Visits</RouterLink>
         </li>
         <li class="nav-item">
           <RouterLink to="/registration" class="btn btn-primary text-white">

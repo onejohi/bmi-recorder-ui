@@ -3,8 +3,8 @@ import axios from 'axios'
 export default function useAxios() {
   const useGet = async(url) => {
     try {
-      const response = await axios.get(`http://127.0.0.1:3000/${url}`)
-      console.log({response})
+      const { status, data } = await axios.get(`http://127.0.0.1:3000/${url}`)
+      if (status === 200) return data
     } catch(error) {
       console.log(error)
     }

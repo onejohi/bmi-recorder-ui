@@ -5,32 +5,20 @@
         <thead>
           <tr>
             <th v-for="header in tableHeader" :key="header.key" scope="col">
-            {{ header.label }}</th>
+            {{ header.label }}
+            </th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <th scope="row">1</th>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>@mdo</td>
-            <td>@mdo</td>
-            <td>@mdo</td>
-          </tr>
-          <tr>
-            <th scope="row">2</th>
-            <td>Jacob</td>
-            <td>Thornton</td>
-            <td>@fat</td>
-            <td>@mdo</td>
-            <td>@mdo</td>
-          </tr>
-          <tr>
-            <th scope="row">3</th>
-            <td colspan="2">Larry the Bi</td>
-            <td>@twitter</td>
-            <td>@mdo</td>
-            <td>@mdo</td>
+          <tr v-for="(visit, index) in visits" :key="index">
+            <th scope="row">{{ index + 1 }}</th>
+            <td>{{ visit.patient.firstName + ' ' + visit.patient.lastName }}</td>
+            <td>{{ visit.patient.dateOfBirth }}</td>
+            <td>{{ visit.bodyMassIndex < 25 ? 'normal' : 'overweight' }}</td>
+            <td>{{ visit.date }}</td>
+            <td>
+              <i class="bi bi-three-dots-vertical"></i>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -39,7 +27,8 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import useAxios from '@/composables/useAxios'
 
 export default {
   name: 'PatientListView',
@@ -52,8 +41,17 @@ export default {
       { key: 'date', label: 'Date' },
       { key: 'actions', label: 'Actions' }
     ])
+    const visits = ref([])
+
+    const { useGet } = useAxios()
+
+    onMounted(async () => {
+      const { data } = await useGet('visit/all')
+      visits.value = data
+    })
 
     return {
+      visits,
       tableHeader
     }
   }

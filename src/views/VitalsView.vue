@@ -25,11 +25,23 @@
             :inputValue="vitals.height"
             labelText="Height (cm)" />
 
+            <div v-if="v$.height.$dirty || v$.height.$model">
+              <div class="input-errors mb-2"  v-for="(error, index) of v$.height.$silentErrors" :key="index">
+                <div class="text-danger">{{ error.$message }}</div>
+              </div>
+            </div>
+
           <BaseInput
             id="weight"
             v-model="vitals.weight"
             :inputValue="vitals.weight"
             labelText="Weight" />
+
+            <div v-if="v$.weight.$dirty || v$.weight.$model">
+              <div class="input-errors mb-2"  v-for="(error, index) of v$.weight.$silentErrors" :key="index">
+                <div class="text-danger">{{ error.$message }}</div>
+              </div>
+            </div>
 
           <BaseInput
             id="bmi"
@@ -59,6 +71,8 @@
 
 <script>
 import { ref, computed } from 'vue'
+import { useVuelidate } from '@vuelidate/core'
+import { required, numeric, minValue } from '@vuelidate/validators'
 import { useRoute, useRouter } from 'vue-router'
 import BaseInput from '@/components/Common/BaseInput.vue'
 import useAxios from '@/composables/useAxios'
@@ -74,6 +88,14 @@ export default {
       height: '',
       weight: '',
     })
+    const rules = computed(() => ({
+      date: { required },
+      height: { required, numeric, minValue: minValue(30) },
+      weight: { required, numeric }
+    }))
+
+    const v$ = useVuelidate(rules, vitals)
+    
     const bmi = computed(() => {
       if (!vitals.value.height || !vitals.value.weight) return (0).toFixed(2)
       return (Number(vitals.value.weight) / ((Number(vitals.value.height) / 100) * (Number(vitals.value.height) / 100))).toFixed(2)
@@ -84,16 +106,19 @@ export default {
     const router = useRouter()
 
     async function createNewVitals() {
-      const body = {
-        patientId: route.params.id,
-        bodyMassIndex: bmi.value,
-        ...vitals.value
+      if (!v$.value.$invalid) {
+        const body = {
+          patientId: route.params.id,
+          bodyMassIndex: bmi.value,
+          ...vitals.value
+        }
+        const response = await usePost('visit/update-vitals', body)
+        router.push({ name: 'form-view', params: { type: bmi.value <= 25 ? 'normal' : 'overweight', formId: response.data._id } })
       }
-      const response = await usePost('visit/update-vitals', body)
-      router.push({ name: 'form-view', params: { type: bmi.value <= 25 ? 'normal' : 'overweight', formId: response.data._id } })
     }
 
     return {
+      v$,
       route,
       vitals,
       bmi,

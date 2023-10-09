@@ -19,11 +19,23 @@
             :inputValue="patient.firstName"
             labelText="First Name" />
 
+            <div v-if="v$.firstName.$dirty || v$.firstName.$model">
+              <div class="input-errors mb-2"  v-for="(error, index) of v$.firstName.$silentErrors" :key="index">
+                <div class="text-danger">{{ error.$message }}</div>
+              </div>
+            </div>
+
           <BaseInput
             id="lastName"
             v-model="patient.lastName"
             :inputValue="patient.lastName"
             labelText="Last Name" />
+
+            <div v-if="v$.lastName.$dirty || v$.lastName.$model">
+              <div class="input-errors mb-2"  v-for="(error, index) of v$.lastName.$silentErrors" :key="index">
+                <div class="text-danger">{{ error.$message }}</div>
+              </div>
+            </div>
 
           <BaseInput
             id="dateOfBirth"
@@ -32,12 +44,24 @@
             :inputValue="patient.dateOfBirth"
             labelText="Date of birth" />
 
+            <div v-if="v$.dateOfBirth.$dirty || v$.dateOfBirth.$model">
+              <div class="input-errors mb-2"  v-for="(error, index) of v$.dateOfBirth.$silentErrors" :key="index">
+                <div class="text-danger">{{ error.$message }}</div>
+              </div>
+            </div>
+
           <select v-model="patient.gender" class="form-select form-select-lg" aria-label="gender">
             <option value="" selected>Gender</option>
             <option value="Male">Male</option>
             <option value="Female">Female</option>
             <option value="Other">Other</option>
           </select>
+
+          <div v-if="v$.gender.$dirty || v$.gender.$model">
+              <div class="input-errors mb-2"  v-for="(error, index) of v$.gender.$silentErrors" :key="index">
+                <div class="text-danger">{{ error.$message }}</div>
+              </div>
+            </div>
 
           <div class="row mt-3">
             <div class="col">
@@ -48,7 +72,11 @@
             <div class="col"></div>
             <div class="col">
               <div class="d-grid gap-2">
-                <button @click="createNewPatient()" type="button" to="/vitals" class="btn btn-success">Save</button>
+                <button
+                  @click="createNewPatient()"
+                  type="button"
+                  to="/vitals"
+                  class="btn btn-success">Save</button>
               </div>
             </div>
           </div>
@@ -59,7 +87,9 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useVuelidate } from '@vuelidate/core'
+import { required, minLength } from '@vuelidate/validators'
 import BaseInput from '@/components/Common/BaseInput.vue'
 import useAxios from '@/composables/useAxios'
 import { useRouter } from 'vue-router'
@@ -79,14 +109,27 @@ export default {
     const { usePost } = useAxios()
     const router = useRouter()
 
+    const rules = computed(() => ({
+      firstName: { required, minLength: minLength(3) },
+      lastName: { required, minLength: minLength(3) },
+      gender: { required },
+      dateOfBirth: { required }
+    }))
+
+    const v$ = useVuelidate(rules, patient)
+
     async function createNewPatient() {
-      const { ok, data } = await usePost('patient/register', patient.value)
-      if (ok) {
-        router.push({ name: 'vitals', params: { id: data._id } })
+
+      if (!v$.value.$invalid) {
+        const { ok, data } = await usePost('patient/register', patient.value)
+        if (ok) {
+          router.push({ name: 'vitals', params: { id: data._id } })
+        }
       }
     }
 
     return {
+      v$,
       patient,
       createNewPatient,
     }

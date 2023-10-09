@@ -14,7 +14,11 @@
             <th scope="row">{{ index + 1 }}</th>
             <td>{{ visit.patient.firstName + ' ' + visit.patient.lastName }}</td>
             <td>{{ visit.patient.dateOfBirth }}</td>
-            <td>{{ visit.bodyMassIndex < 25 ? 'normal' : 'overweight' }}</td>
+            <td>
+              <span class="badge bg-secondary px-2 py-1" :class="visit.bodyMassIndex < 25 ? 'badge bg-success': 'bg-warning'">
+                {{ visit.bodyMassIndex < 25 ? 'normal' : 'overweight' }}
+              </span>
+            </td>
             <td>{{ visit.date }}</td>
             <td>
               <i class="bi bi-three-dots-vertical"></i>

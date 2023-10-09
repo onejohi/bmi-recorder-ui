@@ -1,5 +1,5 @@
 <template>
-  <div class="form-floating mb-3">
+  <div class="form-floating mb-2">
     <input
       :type="type"
       :class="classList"
@@ -9,7 +9,9 @@
       :placeholder="placeholder"
       :disabled="disabled">
     <label :for="id">{{ labelText }}</label>
+
   </div>
+  
 </template>
 
 <script>

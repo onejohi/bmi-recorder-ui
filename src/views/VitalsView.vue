@@ -14,6 +14,7 @@
 
           <BaseInput
             id="date"
+            type="date"
             v-model="vitals.date"
             :inputValue="vitals.date"
             labelText="Date" />
@@ -22,7 +23,7 @@
             id="height"
             v-model="vitals.height"
             :inputValue="vitals.height"
-            labelText="Height" />
+            labelText="Height (cm)" />
 
           <BaseInput
             id="weight"
@@ -70,11 +71,12 @@ export default {
   setup() {
     const vitals = ref({
       date: '',
-      height: 0,
-      weight: 0,
+      height: '',
+      weight: '',
     })
     const bmi = computed(() => {
-      return (Number(vitals.value.weight) / (Number(vitals.value.height) * Number(vitals.value.height))).toFixed(2)
+      if (!vitals.value.height || !vitals.value.weight) return (0).toFixed(2)
+      return (Number(vitals.value.weight) / ((Number(vitals.value.height) / 100) * (Number(vitals.value.height) / 100))).toFixed(2)
     })
 
     const { usePost } = useAxios()
@@ -87,9 +89,8 @@ export default {
         bodyMassIndex: bmi.value,
         ...vitals.value
       }
-      await usePost('visit/update-vitals', body)
-      router.push({ name: 'form-view', params: { type: bmi.value <= 25 ? 'normal' : 'overweight' } })
-
+      const response = await usePost('visit/update-vitals', body)
+      router.push({ name: 'form-view', params: { type: bmi.value <= 25 ? 'normal' : 'overweight', formId: response.data._id } })
     }
 
     return {

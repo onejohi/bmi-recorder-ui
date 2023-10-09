@@ -1,12 +1,13 @@
 <template>
-  <div class="form-check" v-for="option in options" :key="option">
+  <div v-for="option in options" :key="option" class="form-check">
     <input
       class="form-check-input"
-      type="radio"
-      :id="id"
-      @input="$emit('update:modelValue', $event.target.value)"
-      :value="inputValue">
-    <label class="form-check-label" for="flexRadioDefault1">
+        type="radio"
+        :name="id"
+        :id="option"
+        @change="$emit('update:modelValue', option)"
+        :checked="option === modelValue">
+    <label class="form-check-label" :for="option">
       {{ option }}
     </label>
   </div>
@@ -24,7 +25,11 @@ export default {
       type: Array,
       default: () => []
     },
+    modelValue: {
+      type: String,
+      default: ''
+    },
   },
-  emits: ['update:modelValue']
+  emits: ['update:modelValue'],
 }
 </script>

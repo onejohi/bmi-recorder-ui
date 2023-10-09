@@ -27,12 +27,13 @@
 
           <BaseInput
             id="dateOfBirth"
+            type="date"
             v-model="patient.dateOfBirth"
             :inputValue="patient.dateOfBirth"
             labelText="Date of birth" />
 
           <select v-model="patient.gender" class="form-select form-select-lg" aria-label="gender">
-            <option selected>Gender</option>
+            <option value="" selected>Gender</option>
             <option value="Male">Male</option>
             <option value="Female">Female</option>
             <option value="Other">Other</option>

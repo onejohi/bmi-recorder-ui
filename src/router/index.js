@@ -20,7 +20,7 @@ const router = createRouter({
       component: () => import('../views/VitalsView.vue')
     },
     {
-      path: '/form-view/:type',
+      path: '/form-view/:type/:formId',
       name: 'form-view',
       component: () => import('../views/FormView.vue')
     }

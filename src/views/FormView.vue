@@ -10,7 +10,7 @@
         </div>
         <div class="col">
 
-          <h1 class="display-5 mb-4">
+          <h1 class="display-5 mb-4 mt-5">
             {{ route.params.type === 'normal' ? 'Form A' : 'Form B (Overweight)' }}
           </h1>
 
@@ -19,7 +19,10 @@
               {{ question.question }}
             </p>
 
-            <RadioInput :options="question.options" :id="question._id" />
+            <RadioInput
+              :options="question.options"
+              :id="question._id"
+              v-model="question.answer" />
           </div>
 
           <div class="row mt-3">
@@ -31,7 +34,7 @@
             <div class="col"></div>
             <div class="col">
               <div class="d-grid gap-2">
-                <RouterLink type="button" to="/vitals" class="btn btn-success">Save</RouterLink>
+                <button type="button" @click="saveAnswers()" class="btn btn-success">Save</button>
               </div>
             </div>
           </div>
@@ -45,7 +48,7 @@
 import { onMounted, ref } from 'vue'
 import RadioInput from '@/components/Common/RadioInput.vue'
 import useAxios from '@/composables/useAxios'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 export default {
   name: 'FormView',
@@ -54,7 +57,8 @@ export default {
   },
   setup() {
     const route = useRoute()
-    const { useGet } = useAxios()
+    const router = useRouter()
+    const { useGet, usePost } = useAxios()
     const questions = ref([])
 
     onMounted(async () => {
@@ -62,9 +66,17 @@ export default {
       questions.value = data.questions
     })
 
+    async function saveAnswers() {
+      const response = await usePost(`visit/fill-form/${route.params.formId}`, { questions: questions.value })
+      if (response.ok) {
+        router.push({ name: 'home' })
+      }
+    }
+
     return {
       questions,
       route,
+      saveAnswers
     }
   }
 }
